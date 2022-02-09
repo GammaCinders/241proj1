@@ -39,27 +39,16 @@ void main(int argc, char *argv[]) {
 			key[i] = -key[i];
 		}
 	}	
-	//put rest of alphabet
-	int n = 0;
-	//goes through the rest of key[] indexes
-	for(int i=25; i>=keyLen; i--) {
+	//put rest of alphabet in key[] backwards
+	int n = 25;
+	for(int i=keyLen; i<26; i++) {
 		while(alphabet[n] == -1) {
-			n++;
+			n--;
 		}	
 
 		key[i] = alphabet[n];
+		n--;
 	}
-
-
-	for(int i=0; i<26; i++) {
-		printf("%d ", alphabet[i]);
-	}
-	printf("\n");
-
-	for(int i=0; i<26; i++) {
-		printf("%c ", key[i]+'a');
-	}
-	printf("\n");
 
 	//load files needed to run program and check for errors
 	FILE *in = fopen(argv[1], "r");
