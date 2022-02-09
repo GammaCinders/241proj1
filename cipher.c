@@ -1,110 +1,73 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include<strings.h>
 #include<ctype.h>
 
-char *encrypt(char *message);
-char *decrypt(char *message, char *key);
-char *createCipher(char *message);
+#define keyLen strlen(argv[2])
 
-int main(int argc, char *argv[]) {
+//Maybe change to a char pointer later
+char encryptDecrypt(char ch, int k);
 
-	//TODO argc should always be 5 (check criteria)
-	char option = *argv[4];
-	
-	//obv need to check for file open validity after
-	FILE *in = fopen(argv[1], "r");
-	FILE *out = fopen(argv[3], "w");
-	
-	//cipher and char stuff idk
-	char *cipher = createCipher(argv[2]);
+void main(int argc, char *argv[]) {
 
-	char c;
-
-	if(option == 'd') {
-		while(!feof(in)) {
-			fscanf(in, "%c", &c);
-
-			if(isupper(c)) {
-				fprintf(out, "%c", toupper('a'+(index(cipher, tolower(c))-cipher)));
-			} else if(islower(c)) {
-				fprintf(out, "%c", 'a'+(index(cipher, tolower(c))-cipher));
-			} else {
-				fprintf(out, "%c", c);
-			}
-		}
+	//obligitory error checking
+	if(argc != 5) {
+		printf("Usage: cipher inputFile key outputFile option(e or d)\n");
+		printf("Option e for encryption and d for decryption");
+		exit(1);
 	}
 
-	if(option == 'e') {
-		while(!feof(in)) {
-			fscanf(in, "%c", &c);
 
-			if(isupper(c)) {
-				fprintf(out, "%c", toupper(cipher[c-'A']));
-			} else if(islower(c)) {
-				fprintf(out, "%c", cipher[c-'a']); 
-			} else {
-				fprintf(out, "%c", c);
-			}
+	//setup keylength and add each char value in alphabet to array
+	int key[keyLen];
+	for(int i=0; i<keyLen; i++) {
+		if(isupper(*(argv[2]+i))) {
+			key[i] = *(argv[2]+i)-'A';
+		} else if(islower(*(argv[2]+i))) {
+			key[i] = *(argv[2]+i)-'a';
+		} else {
+			key[i] = 0;
 		}
+
+		if(strcmp(argv[4], "d") == 0) {
+			key[i] = -key[i];
+		}
+	}	
+
+	//load files needed to run program and check for errors
+	FILE *in = fopen(argv[1], "r");
+	FILE *out = fopen(argv[3], "w");
+	if(in == NULL || out == NULL) {
+		printf("File could not be opened!\n");
+		exit(1);
+	}
+
+	//run through the in file char by char and encrypt/decrypt to out file
+	char c;
+	int n = 0;
+	while(fscanf(in, "%c", &c) != EOF) {
+		fprintf(out, "%c", encryptDecrypt(c, key[n%keyLen]));
+		n++;
 	}
 
 	fclose(in);
 	fclose(out);
-	free(cipher);
-
-	return 1;
 }
 
-char *encrypt(char *message) {
+char encryptDecrypt(char c, int k) {
 	
-}
-
-//TODO not going to work for other symbols
-char *createCipher(char *key) {
-
-	//just add int symbols that counts the number of 
-	//symbols (non letter chars) in key and then do
-	//char cipher[26+numOfNonletters]
-	char *cipher = (char*)malloc(sizeof(char)*26);
-	//char cipher[26];
-
-	//inc cp to first emtpy index of cipher (or end of key in cipher) 
-	for(int i=0; i<strlen(key); i++) {
-		cipher[i] = tolower(key[i]);
-	}	
-
-	char *cp = cipher+strlen(key);
-
-	//copies all other letters not used into cipher
-
-	for(int i='z'; i>='a'; i--) {
-		//make sure to have only 26 chars total
-		if(cp >= &(cipher[26])) {
-			break;
-		}
-
-		//skip any letters in key 
-		int isUsed = 0;
-		for(int j=0; j<strlen(key); j++) {
-			if(key[j]==i) {
-				isUsed = 1;
-				break;
-			}
-		}
-		//set cipher to correct value and inc cp
-		if(isUsed==0) {
-			*cp = i;
-			cp++;
-		}
+	//rotates k to first positive alph value
+	while(k < 0) {
+		k = k + 26;
 	}
 
-	//debug printing
-/*	for(int i=0; i<26; i++) {
-		printf("%c", cipher[i]);
+	if(isupper(c)) {
+		return ((c - 'A' + k) % 26) + 'A';
 	}
-	printf("\n%d\n", strlen(cipher));
-*/
-	return cipher;
+
+	if(islower(c)) {
+		return ((c - 'a' + k) % 26) + 'a';
+	}
+
+	return c;
 }
