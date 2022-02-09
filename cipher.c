@@ -5,7 +5,9 @@
 
 #define keyLen strlen(argv[2])
 
-//Maybe change to a char pointer later
+int key[26];
+int alphabet[26];
+
 char encryptDecrypt(char ch, int k);
 
 void main(int argc, char *argv[]) {
@@ -17,14 +19,18 @@ void main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-
+	//init alphabet key array
+	for(int i=0; i<26; i++) {
+		alphabet[i] = i;
+	}
 	//setup keylength and add each char value in alphabet to array
-	int key[keyLen];
 	for(int i=0; i<keyLen; i++) {
 		if(isupper(*(argv[2]+i))) {
 			key[i] = *(argv[2]+i)-'A';
+			alphabet[key[i]] = -1;
 		} else if(islower(*(argv[2]+i))) {
 			key[i] = *(argv[2]+i)-'a';
+			alphabet[key[i]] = -1;
 		} else {
 			key[i] = 0;
 		}
@@ -33,6 +39,27 @@ void main(int argc, char *argv[]) {
 			key[i] = -key[i];
 		}
 	}	
+	//put rest of alphabet
+	int n = 0;
+	//goes through the rest of key[] indexes
+	for(int i=25; i>=keyLen; i--) {
+		while(alphabet[n] == -1) {
+			n++;
+		}	
+
+		key[i] = alphabet[n];
+	}
+
+
+	for(int i=0; i<26; i++) {
+		printf("%d ", alphabet[i]);
+	}
+	printf("\n");
+
+	for(int i=0; i<26; i++) {
+		printf("%c ", key[i]+'a');
+	}
+	printf("\n");
 
 	//load files needed to run program and check for errors
 	FILE *in = fopen(argv[1], "r");
@@ -44,7 +71,7 @@ void main(int argc, char *argv[]) {
 
 	//run through the in file char by char and encrypt/decrypt to out file
 	char c;
-	int n = 0;
+	n = 0;
 	while(fscanf(in, "%c", &c) != EOF) {
 		fprintf(out, "%c", encryptDecrypt(c, key[n%keyLen]));
 		n++;
