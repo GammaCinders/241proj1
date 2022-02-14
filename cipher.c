@@ -5,7 +5,9 @@
 
 #define keyLen strlen(argv[2])
 
+/* holds each number 0-25 once in order based on argv key input */
 int key[26];
+/* holds numbers 0-25 in order */
 int alphabet[26];
 
 char encryptDecrypt(char ch, int k);
@@ -19,11 +21,11 @@ void main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	//init alphabet key array
+	//init alphabet key array {0 - 25}
 	for(int i=0; i<26; i++) {
 		alphabet[i] = i;
 	}
-	//setup keylength and add each char value in alphabet to array
+	//setup key[] to hold correct order of alphabet value (0-25) based on arg key
 	for(int i=0; i<keyLen; i++) {
 		if(isupper(*(argv[2]+i))) {
 			key[i] = *(argv[2]+i)-'A';
@@ -35,6 +37,7 @@ void main(int argc, char *argv[]) {
 			key[i] = 0;
 		}
 
+		//invert/reverse rotation in alphabet when decrypting
 		if(strcmp(argv[4], "d") == 0) {
 			key[i] = -key[i];
 		}
@@ -42,6 +45,7 @@ void main(int argc, char *argv[]) {
 	//put rest of alphabet in key[] backwards
 	int n = 25;
 	for(int i=keyLen; i<26; i++) {
+		//skip element already used and marked earlier
 		while(alphabet[n] == -1) {
 			n--;
 		}	
@@ -58,7 +62,7 @@ void main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	//run through the in file char by char and encrypt/decrypt to out file
+	//run through in file char by char and encrypt/decrypt to out file
 	char c;
 	n = 0;
 	while(fscanf(in, "%c", &c) != EOF) {
@@ -72,7 +76,8 @@ void main(int argc, char *argv[]) {
 
 char encryptDecrypt(char c, int k) {
 	
-	//rotates k to first positive alph value
+	//rotates k to first positive alphabet letter value
+	//so that k is always >= 0 and < 26
 	while(k < 0) {
 		k = k + 26;
 	}
