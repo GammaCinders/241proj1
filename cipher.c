@@ -25,7 +25,7 @@ void main(int argc, char *argv[]) {
 	for(int i=0; i<26; i++) {
 		alphabet[i] = i;
 	}
-	//setup key[] to hold correct order of alphabet value (0-25) based on arg key
+	//setup key[] to hold cipher based on key arg in alphabet value (0-25)
 	for(int i=0; i<keyLen; i++) {
 		if(isupper(*(argv[2]+i))) {
 			key[i] = *(argv[2]+i)-'A';
@@ -62,7 +62,8 @@ void main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	//run through in file char by char and encrypt/decrypt to out file
+	//run through in file char by char and print respective 
+	//encrypted/decrypted char to out file
 	char c;
 	n = 0;
 	while(fscanf(in, "%c", &c) != EOF) {
